@@ -12,25 +12,24 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. Establish a brand-new, vacant resource group folder for the store
-resource "azurerm_resource_group" "store_rg" {
-  name     = "rg-organic-wellness-store-final1"
-  location = "eastus"
+# 1. READ from the existing final1 folder already active in your account
+data "azurerm_resource_group" "store_rg" {
+  name = "rg-organic-wellness-store-final1"
 }
 
 # 2. Provision an approved Log Analytics Workspace for metrics tracking
 resource "azurerm_log_analytics_workspace" "store_law" {
   name                = "law-store-logs-final1-prod"
-  location            = azurerm_resource_group.store_rg.location
-  resource_group_name = azurerm_resource_group.store_rg.name
+  location            = data.azurerm_resource_group.store_rg.location
+  resource_group_name = data.azurerm_resource_group.store_rg.name
   sku                 = "PerGB2018"
 }
 
 # 3. Create the Container App Environment platform link
 resource "azurerm_container_app_environment" "store_env" {
   name                       = "cae-store-env-final1-prod"
-  location                   = azurerm_resource_group.store_rg.location
-  resource_group_name        = azurerm_resource_group.store_rg.name
+  location                   = data.azurerm_resource_group.store_rg.location
+  resource_group_name        = data.azurerm_resource_group.store_rg.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.store_law.id
 }
 
@@ -38,7 +37,7 @@ resource "azurerm_container_app_environment" "store_env" {
 resource "azurerm_container_app" "store_app" {
   name                         = "biovita-organic-store"
   container_app_environment_id = azurerm_container_app_environment.store_env.id
-  resource_group_name          = azurerm_resource_group.store_rg.name
+  resource_group_name          = data.azurerm_resource_group.store_rg.name
   revision_mode                = "Single"
 
   template {
