@@ -12,15 +12,15 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. Establish a clean, dedicated resource group folder for the store
+# 1. Establish a brand-new, vacant resource group folder for the store
 resource "azurerm_resource_group" "store_rg" {
-  name     = "rg-organic-wellness-store-v2"
+  name     = "rg-organic-wellness-store-final1"
   location = "eastus"
 }
 
 # 2. Provision an approved Log Analytics Workspace for metrics tracking
 resource "azurerm_log_analytics_workspace" "store_law" {
-  name                = "law-store-logs-final-v2"
+  name                = "law-store-logs-final1-prod"
   location            = azurerm_resource_group.store_rg.location
   resource_group_name = azurerm_resource_group.store_rg.name
   sku                 = "PerGB2018"
@@ -28,7 +28,7 @@ resource "azurerm_log_analytics_workspace" "store_law" {
 
 # 3. Create the Container App Environment platform link
 resource "azurerm_container_app_environment" "store_env" {
-  name                       = "cae-store-env-final-v2"
+  name                       = "cae-store-env-final1-prod"
   location                   = azurerm_resource_group.store_rg.location
   resource_group_name        = azurerm_resource_group.store_rg.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.store_law.id
