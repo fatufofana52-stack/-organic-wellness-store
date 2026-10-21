@@ -12,32 +12,33 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. Just READ from that existing final resource group instead of rebuilding it
-data "azurerm_resource_group" "store_rg" {
-  name = "rg-organic-storefront-final"
+# 1. Establish a clean, dedicated resource group folder for the store
+resource "azurerm_resource_group" "store_rg" {
+  name     = "rg-organic-wellness-store-v2"
+  location = "eastus"
 }
 
 # 2. Provision an approved Log Analytics Workspace for metrics tracking
 resource "azurerm_log_analytics_workspace" "store_law" {
-  name                = "law-store-logs-final"
-  location            = data.azurerm_resource_group.store_rg.location
-  resource_group_name = data.azurerm_resource_group.store_rg.name
+  name                = "law-store-logs-final-v2"
+  location            = azurerm_resource_group.store_rg.location
+  resource_group_name = azurerm_resource_group.store_rg.name
   sku                 = "PerGB2018"
 }
 
-# 3. Build a fresh Container App Environment profile container
+# 3. Create the Container App Environment platform link
 resource "azurerm_container_app_environment" "store_env" {
-  name                       = "cae-store-env-final"
-  location                   = data.azurerm_resource_group.store_rg.location
-  resource_group_name        = data.azurerm_resource_group.store_rg.name
+  name                       = "cae-store-env-final-v2"
+  location                   = azurerm_resource_group.store_rg.location
+  resource_group_name        = azurerm_resource_group.store_rg.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.store_law.id
 }
 
-# 4. Spin up your lightweight Nginx container to host your HTML pages natively
+# 4. Spin up your lightweight web server node container to host your HTML pages natively
 resource "azurerm_container_app" "store_app" {
   name                         = "biovita-organic-store"
   container_app_environment_id = azurerm_container_app_environment.store_env.id
-  resource_group_name          = data.azurerm_resource_group.store_rg.name
+  resource_group_name          = azurerm_resource_group.store_rg.name
   revision_mode                = "Single"
 
   template {
