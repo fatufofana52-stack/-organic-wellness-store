@@ -12,28 +12,26 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. READ from the existing final1 folder already active in your account
+# 1. READ from your existing active final1 resource group container
 data "azurerm_resource_group" "store_rg" {
   name = "rg-organic-wellness-store-final1"
 }
 
-# 2. Provision an approved Log Analytics Workspace for metrics tracking
-resource "azurerm_log_analytics_workspace" "store_law" {
+# 2. READ from your existing Log Analytics Workspace instead of rebuilding it
+data "azurerm_log_analytics_workspace" "store_law" {
   name                = "law-store-logs-final1-prod"
-  location            = data.azurerm_resource_group.store_rg.location
   resource_group_name = data.azurerm_resource_group.store_rg.name
-  sku                 = "PerGB2018"
 }
 
-# 3. Create the Container App Environment platform link
+# 3. Build a fresh Container App Environment profile container
 resource "azurerm_container_app_environment" "store_env" {
-  name                       = "cae-store-env-final1-prod"
+  name                       = "cae-store-env-final1-prod-v3" # Bumped suffix to ensure a clean path
   location                   = data.azurerm_resource_group.store_rg.location
   resource_group_name        = data.azurerm_resource_group.store_rg.name
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.store_law.id
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.store_law.id
 }
 
-# 4. Spin up your lightweight web server node container to host your HTML pages natively
+# 4. Spin up your lightweight Nginx container to host your HTML pages natively
 resource "azurerm_container_app" "store_app" {
   name                         = "biovita-organic-store"
   container_app_environment_id = azurerm_container_app_environment.store_env.id
