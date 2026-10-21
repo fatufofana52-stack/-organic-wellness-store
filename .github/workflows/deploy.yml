@@ -1,42 +1,45 @@
-name: Build and Deploy Static Storefront to Azure
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+  }
+}
 
-on:
-  push:
-    branches:
-      - main
+provider "azurerm" {
+  features {}
+  skip_provider_registration = true
+}
 
-permissions:
-  contents: read
+# 1. READ from your existing active bootcamp resource group instead of rebuilding it
+data "azurerm_resource_group" "store_rg" {
+  name = "rg-cloud-bootcamp-project"
+}
 
-jobs:
-  deploy-infrastructure:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code from Repository
-        uses: actions/checkout@v3
+# 2. Deploy your supplement store directly onto your existing free environment!
+resource "azurerm_container_app" "store_app" {
+  name                         = "biovita-organic-store"
+  container_app_environment_id = "/subscriptions/a3904a1d-fde9-4185-bc58-808196406b61/resourceGroups/rg-cloud-bootcamp-project/providers/Microsoft.App/managedEnvironments/cae-bootcamp-env"
+  resource_group_name          = data.azurerm_resource_group.store_rg.name
+  revision_mode                = "Single"
 
-      - name: Set up Terraform Engine
-        uses: hashicorp/setup-terraform@v2
+  template {
+    container {
+      name   = "web-storefront"
+      image  = "nginx:alpine"
+      cpu    = "0.25"
+      memory = "0.5Gi"
+    }
+  }
 
-      - name: Run Terraform Initialization
-        run: terraform init
-        env:
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
-      - name: Execute Automated Cloud Deployment
-        run: terraform apply -auto-approve
-        env:
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
-      - name: Sync HTML Content to Live Container Node
-        uses: azure/CLI@v1
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az containerapp replica count set --name biovita-organic-store --resource-group rg-cloud-bootcamp-project --count 1
+  ingress {
+    allow_insecure_connections = false
+    target_port                = 80
+    external_enabled           = true
+    traffic_weight {
+      percentage      = 100
+      latest_revision = true
+    }
+  }
+}
