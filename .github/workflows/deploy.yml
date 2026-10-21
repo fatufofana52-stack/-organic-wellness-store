@@ -39,4 +39,4 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az containerapp replica count set --name biovita-organic-store --resource-group rg-organic-wellness-store-v3 --count 1
+            az containerapp replica count set --name biovita-organic-store --resource-group rg-cloud-bootcamp-project --count 1
