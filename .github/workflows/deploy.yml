@@ -39,7 +39,6 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-      # Fixed: Uses your individual secrets to build the authorization token inline
       - name: Log in to Azure
         uses: azure/login@v1
         with:
@@ -52,6 +51,6 @@ jobs:
           inlineScript: |
             echo "Uploading storefront assets to the container..."
             az containerapp replica count set \
-              --name biovita-organic-store-final2 \
-              --resource-group rg-organic-wellness-store-final2 \
+              --name biovita-organic-store-final3 \
+              --resource-group rg-organic-wellness-store-final3 \
               --count 1
