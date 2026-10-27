@@ -12,13 +12,13 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. CREATE or reference your resource group container in the permitted region
+# 1. CREATE your new resource group container inside East US
 resource "azurerm_resource_group" "store_rg" {
   name     = "rg-organic-wellness-store-final1"
-  location = "eastus" # Switched back to East US to satisfy your subscription policy
+  location = "eastus"
 }
 
-# 2. CREATE a fresh Log Analytics Workspace inside East US
+# 2. CREATE a fresh Log Analytics Workspace inside East US for your store logs
 resource "azurerm_log_analytics_workspace" "store_law" {
   name                = "law-store-logs-final1-prod"
   location            = azurerm_resource_group.store_rg.location
@@ -27,16 +27,16 @@ resource "azurerm_log_analytics_workspace" "store_law" {
   retention_in_days   = 30
 }
 
-# 3. READ from the existing Container App Environment in East US instead of building a new one
+# 3. HOOK INTO your existing showcasing environment safely
 data "azurerm_container_app_environment" "store_env" {
-  name                = "cae-store-env-final1-prod-v3" # Change this name to match your existing environment name if it differs
-  resource_group_name = azurerm_resource_group.store_rg.name
+  name                = "cae-bootcamp-env"
+  resource_group_name = "rg-cloud-portfolio-v3"
 }
 
-# 4. Spin up your lightweight Nginx container inside the permitted environment layout
+# 4. Spin up your new lightweight Nginx container inside your existing environment
 resource "azurerm_container_app" "store_app" {
   name                         = "biovita-organic-store"
-  container_app_environment_id = data.azurerm_container_app_environment.store_env.id # Uses the read data block
+  container_app_environment_id = data.azurerm_container_app_environment.store_env.id 
   resource_group_name          = azurerm_resource_group.store_rg.name
   revision_mode                = "Single"
 
