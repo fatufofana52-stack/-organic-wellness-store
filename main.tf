@@ -12,34 +12,32 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. CREATE your new deployment resource group container automatically
+# 1. CREATE or reference your resource group container in the permitted region
 resource "azurerm_resource_group" "store_rg" {
   name     = "rg-organic-wellness-store-final1"
-  location = "eastus2" # Deployed to East US 2 to bypass regional environment restrictions
+  location = "eastus" # Switched back to East US to satisfy your subscription policy
 }
 
-# 2. CREATE a fresh Log Analytics Workspace to collect your application logs
+# 2. CREATE a fresh Log Analytics Workspace inside East US
 resource "azurerm_log_analytics_workspace" "store_law" {
   name                = "law-store-logs-final1-prod"
   location            = azurerm_resource_group.store_rg.location
   resource_group_name = azurerm_resource_group.store_rg.name
-  sku                 = "PerGB2018" # Standard pricing tier required for log retention
+  sku                 = "PerGB2018"
   retention_in_days   = 30
 }
 
-# 3. Build a fresh Container App Environment profile container linked to your logs
-resource "azurerm_container_app_environment" "store_env" {
-  name                       = "cae-store-env-final1-prod-v3"
-  location                   = azurerm_resource_group.store_rg.location
-  resource_group_name        = azurerm_resource_group.store_rg.name
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.store_law.id
+# 3. READ from the existing Container App Environment in East US instead of building a new one
+data "azurerm_container_app_environment" "store_env" {
+  name                = "cae-store-env-final1-prod-v3" # Change this name to match your existing environment name if it differs
+  resource_group_name = azurerm_resource_group.store_rg.name
 }
 
-# 4. Spin up your lightweight Nginx container to host your HTML pages natively
+# 4. Spin up your lightweight Nginx container inside the permitted environment layout
 resource "azurerm_container_app" "store_app" {
   name                         = "biovita-organic-store"
-  container_app_environment_id = azurerm_container_app_environment.store_env.id
-  resource_group_name          = azurerm_resource_group.store_rg.name # Fixed reference from data to resource
+  container_app_environment_id = data.azurerm_container_app_environment.store_env.id # Uses the read data block
+  resource_group_name          = azurerm_resource_group.store_rg.name
   revision_mode                = "Single"
 
   template {
