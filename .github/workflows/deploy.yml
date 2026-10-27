@@ -54,3 +54,4 @@ jobs:
               --name biovita-organic-store \
               --resource-group rg-organic-wellness-store-final1 \
               --count 1
+
