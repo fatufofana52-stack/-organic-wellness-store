@@ -23,7 +23,7 @@ jobs:
       - name: Run Terraform Initialization
         run: terraform init
         id: init
-        working-directory: ./organic-wellness-store
+        working-directory: . # Changed back to root because your main.tf sits in the main repository path
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -32,7 +32,7 @@ jobs:
 
       - name: Execute Automated Cloud Deployment
         run: terraform apply -auto-approve
-        working-directory: ./organic-wellness-store
+        working-directory: . # Changed back to root because your main.tf sits in the main repository path
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
