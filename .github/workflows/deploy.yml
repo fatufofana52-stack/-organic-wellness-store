@@ -23,7 +23,7 @@ jobs:
       - name: Run Terraform Initialization
         run: terraform init
         id: init
-        working-directory: . # Changed back to root because your main.tf sits in the main repository path
+        working-directory: .
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -32,17 +32,18 @@ jobs:
 
       - name: Execute Automated Cloud Deployment
         run: terraform apply -auto-approve
-        working-directory: . # Changed back to root because your main.tf sits in the main repository path
+        working-directory: .
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
+      # Fixed: Uses your individual secrets to build the authorization token inline
       - name: Log in to Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
       - name: Sync HTML Content to Nginx Container
         uses: azure/CLI@v1
