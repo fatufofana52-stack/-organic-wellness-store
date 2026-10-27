@@ -7,10 +7,10 @@
     <!-- Tailwind CSS Engine Link -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-stone-50 text-stone-800 antialiased font-sans">
+<body class="bg-stone-50 text-stone-800 antialiased font-sans relative overflow-x-hidden">
 
     <!-- Header Navigation -->
-    <header class="bg-white border-b border-stone-200 sticky top-0 z-50">
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <span class="text-xl font-bold tracking-tight text-emerald-700">🌿 BIOVITA</span>
@@ -22,104 +22,107 @@
                 <a href="#" class="text-stone-600 hover:text-emerald-700 transition">Testing Logs</a>
             </nav>
             <div class="flex items-center gap-4">
-                <button class="relative p-2 text-stone-600 hover:text-emerald-700 transition">
-                    <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-emerald-600 rounded-full">0</span>
+                <button id="open-cart-btn" class="relative p-2 text-stone-600 hover:text-emerald-700 transition flex items-center gap-2 font-medium">
+                    <span id="cart-counter" class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform bg-emerald-600 rounded-full transition-all duration-300 scale-100">0</span>
                     🛒 Cart
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Hero Showcase Section -->
-    <section class="bg-gradient-to-b from-emerald-50 to-stone-50 py-12 border-b border-stone-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-stone-900 mb-4">Bioavailable Cloud Nutrition</h1>
-            <p class="text-lg text-stone-600 max-w-2xl mx-auto">100% Traceable. High-Potency. Formulated without synthetic filler matrix compounds.</p>
+    <!-- Side Sliding Cart Drawer Panel Overlay -->
+    <div id="cart-drawer-overlay" class="fixed inset-0 bg-black/40 z-50 pointer-events-none opacity-0 transition-opacity duration-300"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white z-50 shadow-2xl translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-6 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+            <h2 class="text-lg font-bold text-stone-900 flex items-center gap-2">🛒 Your Selection</h2>
+            <button id="close-cart-btn" class="text-stone-400 hover:text-stone-600 text-xl font-bold p-1">✕</button>
+        </div>
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Dynamic Items Added Here -->
+            <p id="empty-cart-msg" class="text-center text-stone-400 py-12 text-sm italic">Your cart is currently empty.</p>
+        </div>
+        <div class="p-6 border-t border-stone-200 bg-stone-50 space-y-4">
+            <div class="flex items-center justify-between font-bold text-stone-900">
+                <span>Estimated Total:</span>
+                <span id="cart-total-price">$0.00</span>
+            </div>
+            <button class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl transition text-center shadow-md">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Hero Showcase Section with Graphic Nature Backdrop -->
+    <section class="relative bg-stone-900 text-white py-24 border-b border-stone-100 overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-40">
+            <img src="https://unsplash.com" alt="Organic Herb Background" class="w-full h-full object-cover">
+        </div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4 drop-shadow-md">Bioavailable Cloud Nutrition</h1>
+            <p class="text-lg text-emerald-100 max-w-2xl mx-auto drop-shadow-md">100% Traceable. High-Potency. Formulated without synthetic filler matrix compounds.</p>
         </div>
     </section>
 
+    <!-- Filter Control Toolbar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-stone-200 pb-6">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-stone-400 mr-2">Objective:</span>
+                <button class="filter-btn active bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-sm" data-category="all">Show All</button>
+                <button class="filter-btn bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-bold px-4 py-2 rounded-full transition" data-category="energy">Energy & Neurology</button>
+                <button class="filter-btn bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-bold px-4 py-2 rounded-full transition" data-category="ancestral">Ancestral Superfood</button>
+                <button class="filter-btn bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-bold px-4 py-2 rounded-full transition" data-category="minerals">Trace Minerals</button>
+                <button class="filter-btn bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-bold px-4 py-2 rounded-full transition" data-category="longevity">Cellular Longevity</button>
+            </div>
+            <div class="text-xs text-stone-500 font-mono">
+                Showing <span id="visible-count">4</span> premium profiles
+            </div>
+        </div>
+    </div>
+
     <!-- Premium Supplement Product Grid -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             
             <!-- Item 1: Methylcobalamin B12 -->
-            <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+            <div class="product-card bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition duration-300" data-category="energy">
                 <div>
                     <img src="https://unsplash.com" alt="Methyl B12 Supplements" class="w-full h-48 object-cover border-b border-stone-100">
                     <div class="p-6">
                         <span class="text-xs text-emerald-700 uppercase font-bold tracking-wider">Energy & Neurology</span>
-                        <h3 class="text-lg font-bold text-stone-900 mt-1">Methyl B12</h3>
+                        <h3 class="product-title text-lg font-bold text-stone-900 mt-1">Methyl B12</h3>
                         <p class="text-xs text-stone-500 font-mono mt-0.5">High-Potency Methylcobalamin</p>
                         <p class="text-sm text-stone-600 mt-3">Active co-enzyme form for maximum cellular absorption limits.</p>
                     </div>
                 </div>
                 <div class="p-6 pt-0 border-t border-stone-100 mt-4 flex items-center justify-between">
-                    <span class="text-xl font-black text-stone-900">$29.00</span>
-                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Add to Order</button>
+                    <span class="product-price text-xl font-black text-stone-900" data-price="29.00">$29.00</span>
+                    <button class="add-to-cart bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors duration-200">Add to Order</button>
                 </div>
             </div>
 
             <!-- Item 2: Grass-Fed Beef Liver -->
-            <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+            <div class="product-card bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition duration-300" data-category="ancestral">
                 <div>
                     <img src="https://unsplash.com" alt="Ancestral Beef Liver Capsules" class="w-full h-48 object-cover border-b border-stone-100">
                     <div class="p-6">
                         <span class="text-xs text-amber-700 uppercase font-bold tracking-wider">Ancestral Superfood</span>
-                        <h3 class="text-lg font-bold text-stone-900 mt-1">Beef Liver Caps</h3>
+                        <h3 class="product-title text-lg font-bold text-stone-900 mt-1">Beef Liver Caps</h3>
                         <p class="text-xs text-stone-500 font-mono mt-0.5">Defatted Argentine Bovine</p>
                         <p class="text-sm text-stone-600 mt-3">Rich source of bioavailable Vitamin A, Heme Iron, and B-Complex chains.</p>
                     </div>
                 </div>
                 <div class="p-6 pt-0 border-t border-stone-100 mt-4 flex items-center justify-between">
-                    <span class="text-xl font-black text-stone-900">$34.00</span>
-                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Add to Order</button>
+                    <span class="product-price text-xl font-black text-stone-900" data-price="34.00">$34.00</span>
+                    <button class="add-to-cart bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors duration-200">Add to Order</button>
                 </div>
             </div>
 
             <!-- Item 3: Wildcrafted Sea Moss -->
-            <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+            <div class="product-card bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition duration-300" data-category="minerals">
                 <div>
                     <img src="https://unsplash.com" alt="Wildcrafted Sea Moss Extract" class="w-full h-48 object-cover border-b border-stone-100">
                     <div class="p-6">
                         <span class="text-xs text-blue-700 uppercase font-bold tracking-wider">Trace Minerals</span>
-                        <h3 class="text-lg font-bold text-stone-900 mt-1">Wild Sea Moss</h3>
+                        <h3 class="product-title text-lg font-bold text-stone-900 mt-1">Wild Sea Moss</h3>
                         <p class="text-xs text-stone-500 font-mono mt-0.5">Chondrus Crispus Extract</p>
-                        <p class="text-sm text-stone-600 mt-3">Contains essential elemental tracking minerals for organic metabolic homeostasis.</p>
-                    </div>
-                </div>
-                <div class="p-6 pt-0 border-t border-stone-100 mt-4 flex items-center justify-between">
-                    <span class="text-xl font-black text-stone-900">$24.00</span>
-                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Add to Order</button>
-                </div>
-            </div>
-
-            <!-- Item 4: Cellular NAD+ -->
-            <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
-                <div>
-                    <img src="https://unsplash.com" alt="Mitochondrial NAD Longevity" class="w-full h-48 object-cover border-b border-stone-100">
-                    <div class="p-6">
-                        <span class="text-xs text-purple-700 uppercase font-bold tracking-wider">Cellular Longevity</span>
-                        <h3 class="text-lg font-bold text-stone-900 mt-1">NAD+ Co-Factor</h3>
-                        <p class="text-xs text-stone-500 font-mono mt-0.5">Mitochondrial Regenerator</p>
-                        <p class="text-sm text-stone-600 mt-3">Targeted nucleotide system designed to promote cellular energy repair sequences.</p>
-                    </div>
-                </div>
-                <div class="p-6 pt-0 border-t border-stone-100 mt-4 flex items-center justify-between">
-                    <span class="text-xl font-black text-stone-900">$59.00</span>
-                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Add to Order</button>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <footer class="bg-stone-950 text-stone-500 text-xs py-8 mt-24 border-t border-stone-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p>&copy; 2026 BioVita Organics LLC. Simulated Bootcamp Storefront Portfolio Piece.</p>
-            <p class="text-stone-600 text-center sm:text-right max-w-md">Disclaimer: These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat, or prevent any operational disease vectors.</p>
-        </div>
-    </footer>
-
-</body>
-</html>
-
