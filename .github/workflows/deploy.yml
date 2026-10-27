@@ -44,7 +44,7 @@ jobs:
         with:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
 
-      # Fixed: Deploys your raw storefront HTML assets straight into the existing final3 container app architecture
+      # Targets the brand-new clean final4 container layout
       - name: Deploy Frontend Assets to Nginx Container
         uses: azure/CLI@v1
         with:
@@ -52,7 +52,6 @@ jobs:
           inlineScript: |
             echo "Deploying production assets to Container App..."
             az containerapp up \
-              --name biovita-organic-store-final3 \
-              --resource-group rg-organic-wellness-store-final3 \
+              --name biovita-organic-store-final4 \
+              --resource-group rg-organic-wellness-store-final4 \
               --source .
-
