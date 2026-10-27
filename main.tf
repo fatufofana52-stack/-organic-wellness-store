@@ -14,7 +14,7 @@ provider "azurerm" {
 
 # 1. CREATE your new resource group container for final4 inside East US
 resource "azurerm_resource_group" "store_rg" {
-  name     = "rg-organic-wellness-store-final4" # Updated to final4
+  name     = "rg-organic-wellness-store-final5" # Updated to final4
   location = "eastus"
 }
 
