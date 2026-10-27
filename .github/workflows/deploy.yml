@@ -1,10 +1,14 @@
 name: Build and Deploy Static Storefront to Azure
 
-# Trigger this pipeline automatically whenever code is merged into the main branch
 on:
   push:
     branches:
       - main
+      - feature/automation-pipeline
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   deploy-storefront:
@@ -13,14 +17,40 @@ jobs:
       - name: Checkout Code from Repository
         uses: actions/checkout@v3
 
-      - name: Build And Deploy Store to Azure Static Web Apps
-        uses: Azure/static-web-apps-deploy@v1
+      - name: Set up Terraform Engine
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Run Terraform Initialization
+        run: terraform init
+        id: init
+        working-directory: . 
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+      - name: Execute Automated Cloud Deployment
+        run: terraform apply -auto-approve
+        working-directory: .
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+      - name: Log in to Azure
+        uses: azure/login@v1
         with:
-          # Secure API token generated automatically by our cloud infrastructure setup
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          ###### Directory Locations ######
-          app_location: "/"          # Where your index.html lives
-          api_location: ""           # Optional backend API path (leave empty for now)
-          output_location: "/"       # Where built assets reside
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Sync HTML Content to Nginx Container
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            echo "Uploading storefront assets to the container..."
+            az containerapp replica count set \
+              --name biovita-organic-store \
+              --resource-group rg-organic-wellness-store-final1 \
+              --count 1
