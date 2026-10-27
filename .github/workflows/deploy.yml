@@ -23,7 +23,7 @@ jobs:
       - name: Run Terraform Initialization
         run: terraform init
         id: init
-        working-directory: . 
+        working-directory: ./organic-wellness-store
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -32,7 +32,7 @@ jobs:
 
       - name: Execute Automated Cloud Deployment
         run: terraform apply -auto-approve
-        working-directory: .
+        working-directory: ./organic-wellness-store
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -51,7 +51,6 @@ jobs:
           inlineScript: |
             echo "Uploading storefront assets to the container..."
             az containerapp replica count set \
-              --name biovita-organic-store \
-              --resource-group rg-organic-wellness-store-final1 \
+              --name biovita-organic-store-final2 \
+              --resource-group rg-organic-wellness-store-final2 \
               --count 1
-
