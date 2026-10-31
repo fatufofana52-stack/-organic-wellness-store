@@ -40,15 +40,15 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-      # Fixed: Uses the native secure token to bypass Azure CLI authentication blocks
+      # Fixed: Trims hidden spaces and breaks to prevent base64 padding errors
       - name: Upload Storefront Assets using SAS Token
         run: |
           echo "Extracting upload token..."
-          SAS_TOKEN=$(terraform output -raw sas_token)
+          SAS_TOKEN=$(terraform output -raw sas_token | tr -d '\r\n[:space:]')
           
           echo "Uploading index.html directly to web container folder..."
           az storage blob upload \
-            --account-name biovitasstorefinal11 \
+            --account-name biovitasstorefinal12 \
             --container-name '$web' \
             --name index.html \
             --file index.html \

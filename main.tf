@@ -12,15 +12,15 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. CREATE your resource group container for final11 inside East US
+# 1. CREATE your resource group container for final12 inside East US
 resource "azurerm_resource_group" "store_rg" {
-  name     = "rg-organic-wellness-store-final11"
+  name     = "rg-organic-wellness-store-final12"
   location = "eastus"
 }
 
 # 2. CREATE an Azure Storage Account inside East US
 resource "azurerm_storage_account" "store_account" {
-  name                     = "biovitasstorefinal11"
+  name                     = "biovitasstorefinal12"
   resource_group_name      = azurerm_resource_group.store_rg.name
   location                 = azurerm_resource_group.store_rg.location
   account_tier             = "Standard"
