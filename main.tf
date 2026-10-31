@@ -12,15 +12,15 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. CREATE your new resource group container for final6 inside East US
+# 1. CREATE your new resource group container for final7 inside East US
 resource "azurerm_resource_group" "store_rg" {
-  name     = "rg-organic-wellness-store-final6" 
+  name     = "rg-organic-wellness-store-final7" # Updated to final7
   location = "eastus"
 }
 
-# 2. CREATE a fresh Log Analytics Workspace inside East US for final6 logs
+# 2. CREATE a fresh Log Analytics Workspace inside East US for final7 logs
 resource "azurerm_log_analytics_workspace" "store_law" {
-  name                = "law-store-logs-final6-prod" 
+  name                = "law-store-logs-final7-prod" # Updated to final7
   location            = azurerm_resource_group.store_rg.location
   resource_group_name = azurerm_resource_group.store_rg.name
   sku                 = "PerGB2018"
@@ -35,7 +35,7 @@ data "azurerm_container_app_environment" "store_env" {
 
 # 4. Spin up your lightweight Nginx container inside the portfolio environment
 resource "azurerm_container_app" "store_app" {
-  name                         = "biovita-organic-store-final6" 
+  name                         = "biovita-organic-store-final7" # Updated to final7 to prevent cluster conflict
   container_app_environment_id = data.azurerm_container_app_environment.store_env.id 
   resource_group_name          = azurerm_resource_group.store_rg.name
   revision_mode                = "Single"
