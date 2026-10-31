@@ -12,17 +12,17 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-# 1. CREATE your resource group container for final8 inside East US
+# 1. CREATE your fresh resource group container for final9 inside East US
 resource "azurerm_resource_group" "store_rg" {
-  name     = "rg-organic-wellness-store-final8"
+  name     = "rg-organic-wellness-store-final9"
   location = "eastus"
 }
 
-# 2. CREATE a native Azure Static Web App to host your HTML/CSS files natively on the free tier
+# 2. CREATE a native Azure Static Web App forced tightly into East US to satisfy your account policy
 resource "azurerm_static_web_app" "store_site" {
-  name                = "biovita-organic-store-final8"
+  name                = "biovita-organic-store-final9"
   resource_group_name = azurerm_resource_group.store_rg.name
-  location            = "eastus2" # SWAs use eastus2 or westus2 for global edge delivery
-  sku_tier            = "Free"    # Locks it strictly into the zero-cost tier
+  location            = "eastus" # Forced to eastus to clear your account firewall policy
+  sku_tier            = "Free"   # Free tier compliant
   sku_size            = "Free"
 }
