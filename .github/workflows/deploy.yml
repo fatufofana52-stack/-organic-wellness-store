@@ -31,6 +31,7 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
       - name: Execute Automated Cloud Deployment
+        id: apply
         run: terraform apply -auto-approve
         working-directory: .
         env:
@@ -39,21 +40,16 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
-
-      # Uploads your storefront HTML directly into the storage web host container
-      - name: Upload Storefront Assets to Storage Web Container
-        uses: azure/CLI@v1
-        with:
-          azcliversion: latest
-          inlineScript: |
-            echo "Uploading index.html to the static hosting web container..."
-            az storage blob upload \
-              --account-name biovitasstorefinal10 \
-              --container-name '$web' \
-              --name index.html \
-              --file index.html \
-              --auth-mode login
+      # Fixed: Uses the native secure token to bypass Azure CLI authentication blocks
+      - name: Upload Storefront Assets using SAS Token
+        run: |
+          echo "Extracting upload token..."
+          SAS_TOKEN=$(terraform output -raw sas_token)
+          
+          echo "Uploading index.html directly to web container folder..."
+          az storage blob upload \
+            --account-name biovitasstorefinal11 \
+            --container-name '$web' \
+            --name index.html \
+            --file index.html \
+            --sas-token "$SAS_TOKEN"
