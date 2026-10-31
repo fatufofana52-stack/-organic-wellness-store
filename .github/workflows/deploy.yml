@@ -39,13 +39,21 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-      # Authenticates and deploys your HTML directly to the newly built final9 static app layout
-      - name: Deploy Frontend Assets to Azure Static Web App
-        uses: Azure/static-web-apps-deploy@v1
+      - name: Log in to Azure
+        uses: azure/login@v1
         with:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "/"   
-          api_location: ""
-          output_location: "" 
+
+      # Uploads your storefront HTML directly into the storage web host container
+      - name: Upload Storefront Assets to Storage Web Container
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            echo "Uploading index.html to the static hosting web container..."
+            az storage blob upload \
+              --account-name biovitasstorefinal10 \
+              --container-name '$web' \
+              --name index.html \
+              --file index.html \
+              --auth-mode login
